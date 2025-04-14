@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from '@/lib/constant/utils';
-import { Product } from "@/types";
+import { Product } from "@/types";  // Ensure Product type is correct
 
 const ProductCard = ({ product }: { product: Product }) => {
   // 💰 Formats and styles product price into dollars and cents
@@ -41,9 +41,9 @@ const ProductCard = ({ product }: { product: Product }) => {
       <Card className="hover:shadow-lg transition duration-300">
         <CardHeader className="p-0">
           <div className="relative w-full h-48 rounded-t-lg overflow-hidden">
-            {product.image ? (
+            {product.images && product.images.length > 0 ? (
               <Image
-                src={Array.isArray(product.image) ? product.image[0] : product.image}
+                src={product.images[0]} // Use the first image from the images array
                 alt={product.name || "Product image"}
                 width={300}
                 height={192}
@@ -69,7 +69,9 @@ const ProductCard = ({ product }: { product: Product }) => {
           </p>
 
           {/* 💰 Price */}
-          <ProductPrice value={Number(product.price)} className="font-semibold text-green-700" />
+          {/* <ProductPrice value={parseFloat(product.price.toString())} className="font-semibold text-green-700" /> */}
+          <ProductPrice value={Number(product.price)}className="font-semibold text-green-700" />
+
         </CardContent>
       </Card>
     </Link>
