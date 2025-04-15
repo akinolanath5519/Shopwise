@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate && npx lightningcss --version"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",
@@ -45,6 +45,7 @@
     "bufferutil": "^4.0.9",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
+    "lightningcss": "^1.29.3",
     "postcss": "^8.5.3",
     "prisma": "^6.6.0",
     "tailwindcss": "^4.1.3",
