@@ -19,27 +19,23 @@ export function formatNumberWithDecimal(num: number): string {
 
 // Format errors
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function formatError(error: any) {
-  if (error.name === 'ZodError') {
-    // Handle Zod error
-    const fieldErrors = Object.keys(error.errors).map(
-      (field) => error.errors[field].message
-    );
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function formatError(error: any): string {
+  if (error?.name === 'ZodError') {
+    const fieldErrors = error.errors.map((e: any) => e.message);
     return fieldErrors.join('. ');
-  } else if (
-    error.name === 'PrismaClientKnownRequestError' &&
-    error.code === 'P2002'
-  ) {
-    // Handle Prisma error
-    const field = error.meta?.target ? error.meta.target[0] : 'Field';
-    return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
-  } else {
-    // Handle other errors
-    return typeof error.message === 'string'
-      ? error.message
-      : JSON.stringify(error.message);
   }
+
+  if (error?.name === 'PrismaClientKnownRequestError' && error.code === 'P2002') {
+    const field = error.meta?.target?.[0] ?? 'Field';
+    return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
+  }
+
+  if (typeof error?.message === 'string') {
+    return error.message;
+  }
+
+  return 'An unexpected error occurred.';
 }
 
 // Round number to 2 decimal places

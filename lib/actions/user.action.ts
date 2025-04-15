@@ -6,7 +6,10 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { hashSync } from "bcrypt-ts-edge";
 import { db } from "@/db/prisma";
+import {formatError} from '@/lib/constant/utils'
 
+
+//Sign in User
 export async function signInWithCredentials(
   prevState: unknown,
   formData: FormData
@@ -29,10 +32,9 @@ export async function signInWithCredentials(
     const res = await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirect: false, // 👈 disable auto-redirect
+      redirect: false,
     });
 
-    // Check if there's an error in response
     if (res?.error) {
       return {
         success: false,
@@ -40,23 +42,23 @@ export async function signInWithCredentials(
       };
     }
 
-    // Show success message, then handle redirection in client
     return {
       success: true,
       message: "Signed in successfully!",
     };
   } catch (error) {
-    if (isRedirectError(error)) {
-      throw error;
-    }
+    if (isRedirectError(error)) throw error;
 
     return {
       success: false,
-      message: "Invalid email or password.",
+      message: formatError(error), // 👈 Use formatError here
     };
   }
 }
 
+
+
+//Sign Up User
 export async function signUpUser(prevState: unknown, formData: FormData) {
   const rawData = {
     name: formData.get("name"),
@@ -65,10 +67,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     confirmPassword: formData.get("confirmPassword"),
   };
 
-  // Input validation using the schema
   const parsed = signUpFormSchema.safeParse(rawData);
 
-  // If validation fails, return detailed error messages
   if (!parsed.success) {
     return {
       success: false,
@@ -78,7 +78,6 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
   const { name, email, password, confirmPassword } = parsed.data;
 
-  // Check if passwords match
   if (password !== confirmPassword) {
     return {
       success: false,
@@ -86,26 +85,22 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     };
   }
 
-  // Check if user already exists
   try {
     const existingUser = await db.user.findUnique({ where: { email } });
 
     if (existingUser) {
       return {
         success: false,
-        message: "Email already in use.",
+        message: "User already exists.",
       };
     }
   } catch (error) {
-    console.error("Database error:", error); // Log the error for debugging purposes
     return {
       success: false,
-      message:
-        "There was an error checking user existence. Please try again later.",
+      message: formatError(error), // 👈 Use formatError here
     };
   }
 
-  // Create user
   try {
     const hashedPassword = hashSync(password, 10);
 
@@ -122,14 +117,13 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       message: "Account created successfully!",
     };
   } catch (error) {
-    console.error("Error creating user:", error); // Log the error for debugging
     return {
       success: false,
-      message:
-        "There was an error creating the account. Please try again later.",
+      message: formatError(error), // 👈 Use formatError here
     };
   }
 }
+
 
 //sign user out
 export async function signOutUser() {
