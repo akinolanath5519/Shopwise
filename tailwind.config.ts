@@ -1,3 +1,5 @@
+process.env.TAILWIND_DISABLE_OXIDE = '1';
+
 module.exports = {
     content: [
       './pages/**/*.{js,ts,jsx,tsx}',
