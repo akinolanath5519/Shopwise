@@ -9,6 +9,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
+import UserButton from './user-button';
+
 const Menu = () => {
   return (
     <div className="flex justify-end gap-3">
@@ -23,12 +25,7 @@ const Menu = () => {
         </Button>
 
         {/* Sign In Button */}
-        <Button asChild>
-          <Link href="/sign-in" className="flex items-center gap-2">
-            <UserIcon className="w-5 h-5" />
-            <span>Sign In</span>
-          </Link>
-        </Button>
+       <UserButton/>
       </nav>
 
       {/* Mobile Menu */}
@@ -52,12 +49,7 @@ const Menu = () => {
             </Button>
 
             {/* Sign In Link in Mobile Menu */}
-            <Button asChild className="mb-1">
-              <Link href="/sign-in" className="flex items-center gap-2">
-                <UserIcon className="w-5 h-5" />
-                <span>Sign In</span>
-              </Link>
-            </Button>
+            <UserButton/>
 
             <SheetDescription></SheetDescription>
           </SheetContent>
