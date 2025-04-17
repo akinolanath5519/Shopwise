@@ -11,3 +11,17 @@ export const LATEST_PRODUCTS_LIMIT =
     email:'',
     password:''
   };
+
+
+  export const shippingAddressDefaultValues = {
+    fullName: '',
+    phoneNumber: '',  // Example phone number
+    streetAddress: '',
+    city: '',
+    postalCode: '',
+    state: '',  // Default state for the user
+    country: '',
+    lat:'' , // Latitude for New York
+    lng: '', // Longitude for New York
+  };
+  
