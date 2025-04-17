@@ -2,6 +2,7 @@ import Header from "@/components/shared/header";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "next-themes"; // Import ThemeProvider
 import './globals.css';
+import {Toaster} from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -18,7 +19,9 @@ export default function RootLayout({
           disableTransitionOnChange={true}
         >
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1">{children}
+            <Toaster/>
+          </main>
           <Footer />
         </ThemeProvider>
       </body>

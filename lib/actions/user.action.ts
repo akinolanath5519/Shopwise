@@ -5,7 +5,7 @@ import { signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { hashSync } from "bcrypt-ts-edge";
-import { db } from "@/db/prisma";
+import { prisma } from "@/db/prisma";
 import {formatError} from '@/lib/constant/utils'
 
 
@@ -51,7 +51,7 @@ export async function signInWithCredentials(
 
     return {
       success: false,
-      message: formatError(error), // 👈 Use formatError here
+      message: formatError(error), 
     };
   }
 }
@@ -86,7 +86,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
   }
 
   try {
-    const existingUser = await db.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
       return {
@@ -104,7 +104,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
     const hashedPassword = hashSync(password, 10);
 
-    await db.user.create({
+    await prisma.user.create({
       data: {
         name,
         email,

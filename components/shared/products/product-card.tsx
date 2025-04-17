@@ -29,43 +29,56 @@ const ProductCard = ({ product }: { product: Product }) => {
             {i < filledStars ? "★" : "☆"}
           </span>
         ))}
+        <span className="text-gray-500 text-xs ml-1">({rating || 0})</span>
       </div>
     );
   };
 
   return (
     <Link href={`/product/${product.slug}`}>
-      <Card className="group hover:shadow-xl hover:scale-[1.015] transition-transform duration-300 ease-in-out rounded-2xl border border-gray-200 overflow-hidden">
-        <CardHeader className="p-0">
-          <div className="relative w-full h-48 md:h-56 bg-gray-100">
+      <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-200 ease-in-out rounded-xl border border-gray-100 overflow-hidden bg-white">
+        <CardHeader className="p-0 relative">
+          <div className="relative w-full aspect-square bg-gray-50">
             {product.images?.length ? (
               <Image
                 src={product.images[0]}
                 alt={product.name || "Product image"}
                 fill
-                className="object-cover w-full h-full transition duration-300 group-hover:scale-105"
+                className="object-cover w-full h-full transition duration-300 group-hover:scale-110"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority={false}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                No Image
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <span className="text-sm">No Image</span>
               </div>
             )}
           </div>
+          {product.category && (
+            <div className="absolute top-2 left-2">
+              <span className="bg-white/90 text-xs font-medium px-2 py-1 rounded-full text-gray-700 shadow-sm">
+                {product.category}
+              </span>
+            </div>
+          )}
         </CardHeader>
 
-        <CardContent className="p-4 space-y-2">
-          <h3 className="text-base md:text-lg font-semibold text-gray-800 line-clamp-1">
-            {product.name}
-          </h3>
+        <CardContent className="p-4 space-y-2.5">
+          <div className="flex justify-between items-start gap-2">
+            <h3 className="text-base md:text-lg font-semibold text-gray-900 line-clamp-2 leading-tight">
+              {product.name}
+            </h3>
+          </div>
 
           {renderStars(product.rating)}
 
-          <p className="text-sm text-gray-600 line-clamp-2">
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-[40px]">
             {product.description}
           </p>
 
-          <div className="pt-2">
+          <div className="pt-1 flex items-center justify-between">
             <ProductPrice value={Number(product.price)} />
+            
           </div>
         </CardContent>
       </Card>

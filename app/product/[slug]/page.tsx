@@ -1,62 +1,81 @@
 import { getProductBySlug } from "@/lib/actions/product.action";
 import { notFound } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import AddToCart from "@/components/shared/products/add-to-cart";
+import { getMyCart } from "@/lib/actions/cart.action";
 
-// Note: We type props.params as a Promise to indicate it must be awaited.
 const ProductDetailsPage = async (props: { params: Promise<{ slug: string }> }) => {
-  // Await the params promise and then extract slug.
   const { slug } = await props.params;
-
-  // Fetch the product using the slug
   const product = await getProductBySlug(slug);
 
-  // If product is not found, trigger the 404 page
   if (!product) {
     notFound();
   }
 
+  const cart = await getMyCart();
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex flex-col md:flex-row gap-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="flex flex-col md:flex-row gap-8 md:gap-12">
         {/* Product Image */}
         <div className="w-full md:w-1/2">
-          {product.images && product.images.length > 0 ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              width={600}
-              height={400}
-              className="w-full h-auto object-cover rounded-lg shadow-md"
-            />
-          ) : (
-            <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500">
-              No Image Available
-            </div>
-          )}
+          <div className="bg-white rounded-xl shadow-sm border p-4 sticky top-4">
+            {product.images && product.images.length > 0 ? (
+              <div className="aspect-square w-full relative overflow-hidden rounded-lg">
+                <Image
+                  src={product.images[0]}
+                  alt={product.name}
+                  fill
+                  className="object-contain hover:scale-105 transition-transform duration-300"
+                  priority
+                />
+              </div>
+            ) : (
+              <div className="aspect-square w-full bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                No Image Available
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Product Details */}
-        <div className="w-full md:w-1/2 flex flex-col gap-4">
-          <h1 className="text-2xl font-bold">{product.name}</h1>
+        <div className="w-full md:w-1/2">
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Badge variant="secondary" className="text-sm">
+                {product.category}
+              </Badge>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                {product.name}
+              </h1>
+            </div>
 
-          <Badge variant="outline" className="w-fit">
-            {product.category}
-          </Badge>
+            <div className="space-y-2">
+              <p className="text-3xl font-semibold text-gray-900">
+                ₦{product.price?.toLocaleString()}
+              </p>
+            </div>
 
-          <p className="text-xl font-semibold text-green-600">
-            ₦{product.price?.toLocaleString()}
-          </p>
+            <div className="pt-2">
+              <p className="text-gray-700 leading-relaxed">
+                {product.description}
+              </p>
+            </div>
 
-          <p className="text-gray-700">{product.description}</p>
-
-          <div className="mt-4 flex gap-4 flex-col sm:flex-row">
-            <Button className="w-full sm:w-auto">Add to Cart</Button>
-            <Button variant="outline" className="w-full sm:w-auto">
-              Wishlist
-            </Button>
+            <div className="pt-4">
+              <AddToCart
+                cart={cart}
+                item={{
+                  productId: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  price: product.price.toNumber(),
+                  qty: 1,
+                  image: product.images[0] || "",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
