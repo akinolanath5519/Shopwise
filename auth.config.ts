@@ -10,7 +10,7 @@ export const authConfig = {
       const protectedPaths = [
         /\/shipping-address/,
         /\/payment-method/,
-        /\/place-order/,
+        /\/place-order/,    
         /\/profile/,
         /\/user\/(.*)/,
         /\/order\/(.*)/,

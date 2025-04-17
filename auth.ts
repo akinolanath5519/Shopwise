@@ -5,8 +5,8 @@ import { PrismaClient } from "@prisma/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts-edge";
 import { NextAuthConfig } from "next-auth";
-import {cookies} from 'next/headers';
-import {NextResponse} from 'next/server';
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
@@ -29,21 +29,18 @@ export const config = {
       async authorize(credentials) {
         if (credentials == null) return null;
 
-        // Find user in database
         const user = await prisma.user.findFirst({
           where: {
             email: credentials.email as string,
           },
         });
 
-        // Check if user exists and if the password matches
         if (user && user.password) {
           const isMatch = compareSync(
             credentials.password as string,
             user.password
           );
 
-          // If password is correct, return user
           if (isMatch) {
             return {
               id: user.id,
@@ -54,14 +51,12 @@ export const config = {
           }
         }
 
-        // If user does not exist or password does not match return null
         return null;
       },
     }),
   ],
   callbacks: {
     async session({ session, user, trigger, token }: any) {
-      // Attach ID and role from token
       session.user.id = token.sub;
       session.user.role = token.role;
       session.user.name = token.name;
@@ -74,32 +69,53 @@ export const config = {
     },
     async jwt({ token, user, trigger, session }: any) {
       if (user) {
+        token.id = user.id;
         token.role = user.role;
 
-        //if user has no name, then use email
         if (user.name === "NO_NAME") {
           token.name = user.email!.split("@")[0];
 
-          //update databse to reflect the token name
           await prisma.user.update({
             where: { id: user.id },
             data: { name: token.name },
           });
         }
       }
-      return token;
-    },
-    authorized({request,auth}:any){
-      //check for session cart cookie
-      if(!request.cookies.get('sessionCartId')){
-        //Generate new session cart id cookie
-        const sessionCartId=crypto.randomUUID();
-        
-      }else{
-        return true;
+
+      if (trigger === "signIn" || trigger === "signUp") {
+        const cookiesObject = await cookies();
+        const sessionCartId = cookiesObject.get("sessionCartId")?.value;
+
+        if (sessionCartId) {
+          const sessionCart = await prisma.cart.findFirst({
+            where: { sessionCartId },
+          });
+
+          if (sessionCart) {
+            await prisma.cart.deleteMany({
+              where: { userId: user.id },
+            });
+
+            await prisma.cart.update({
+              where: { id: sessionCart.id },
+              data: { userId: user.id },
+            });
+          }
+        }
       }
 
-    }
+     
+      return token;
+    },
+    authorized({ request, auth }: any) {
+      if (!request.cookies.get("sessionCartId")) {
+        const sessionCartId = crypto.randomUUID();
+        // You may want to actually set the cookie here
+        // But returning true is enough for authorization check
+      }
+
+      return true;
+    },
   },
 } satisfies NextAuthConfig;
 

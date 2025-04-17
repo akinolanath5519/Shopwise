@@ -25,3 +25,9 @@ export const LATEST_PRODUCTS_LIMIT =
     lng: '', // Longitude for New York
   };
   
+
+  export const PAYMENT_METHODS = process.env.PAYMENT_METHODS
+  ? process.env.PAYMENT_METHODS.split(', ')
+  : ['PayPal', 'Stripe','Paystack', 'CashOnDelivery'];
+export const DEFAULT_PAYMENT_METHOD =
+  process.env.DEFAULT_PAYMENT_METHOD || 'PayPal';
