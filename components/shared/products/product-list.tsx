@@ -1,7 +1,7 @@
 import ProductCard from './product-card';
 import { Product } from "@/types";
 
-const ProductList = ({ data, title }: { data: Product[]; title?: string }) => {
+const ProductList = ({ data, title = "Latest Products" }: { data: Product[]; title?: string }) => {
   return (
     <div className="my-10">
       <h2 className="text-3xl font-extrabold text-black mb-2">{title}</h2>
