@@ -143,7 +143,6 @@ if(!user) throw new Error('User not found');
 }
 
 
-//update the user address 
 // Update the user's address
 export async function updateUserAddress(data: ShippingAddress) {
   try {
@@ -170,7 +169,6 @@ export async function updateUserAddress(data: ShippingAddress) {
     return { success: false, message: formatError(error) };
   }
 }
-
 
 
 
