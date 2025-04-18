@@ -188,7 +188,7 @@ export async function updateUserPaymentMethod(
 
     await prisma.user.update({
       where: { id: currentUser.id },
-      data: { PaymentMethod: paymentMethod.type },
+      data: { paymentMethod: paymentMethod.type },
     });
 
     return {
