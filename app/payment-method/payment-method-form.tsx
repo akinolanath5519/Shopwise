@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Loader, CreditCard, Banknote, Wallet, QrCode } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { updateUserPaymentMethod } from '@/lib/actions/user.action';
-import { Card, CardContent } from '@/components/ui/card';
 
 const paymentMethodIcons = {
   'Credit Card': <CreditCard className="w-5 h-5" />,
@@ -60,12 +59,12 @@ const PaymentMethodForm = ({
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
-      <div className="bg-white rounded-xl shadow-sm border p-6 sm:p-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Method</h1>
-          <p className="text-gray-600">
-            Choose your preferred payment option to complete your order
+    <div className="max-w-md mx-auto px-4 sm:px-6 py-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
+        <div className="mb-8 text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Payment Method</h1>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Choose how you'd like to pay for your order
           </p>
         </div>
 
@@ -80,7 +79,7 @@ const PaymentMethodForm = ({
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="grid gap-4"
+                      className="grid gap-3"
                     >
                       {PAYMENT_METHODS.map((method) => (
                         <FormItem key={method} className="space-y-0">
@@ -95,13 +94,18 @@ const PaymentMethodForm = ({
                                 htmlFor={method}
                                 className={cn(
                                   "flex items-center justify-between p-4 border rounded-lg cursor-pointer",
-                                  "hover:border-primary transition-colors duration-200",
-                                  "peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary/20",
+                                  "hover:border-primary transition-all duration-200 hover:shadow-sm",
+                                  "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5",
                                   "peer-focus-visible:ring-2 peer-focus-visible:ring-primary/50"
                                 )}
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                                  <div className={cn(
+                                    "p-2 rounded-lg",
+                                    field.value === method 
+                                      ? "bg-primary text-white" 
+                                      : "bg-gray-100 text-gray-600"
+                                  )}>
                                     {paymentMethodIcons[method as keyof typeof paymentMethodIcons] || 
                                      <CreditCard className="w-5 h-5" />}
                                   </div>
@@ -109,9 +113,14 @@ const PaymentMethodForm = ({
                                     {method}
                                   </FormLabel>
                                 </div>
-                                <div className="h-5 w-5 rounded-full border flex items-center justify-center">
+                                <div className={cn(
+                                  "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                                  field.value === method 
+                                    ? "border-primary" 
+                                    : "border-gray-300"
+                                )}>
                                   <div className={cn(
-                                    "h-3 w-3 rounded-full bg-primary transition-all",
+                                    "h-2.5 w-2.5 rounded-full bg-primary transition-all",
                                     field.value === method ? "scale-100" : "scale-0"
                                   )} />
                                 </div>
@@ -127,11 +136,11 @@ const PaymentMethodForm = ({
               )}
             />
 
-            <div className="pt-4">
+            <div className="pt-2">
               <Button
                 type="submit"
                 size="lg"
-                className="w-full md:w-auto px-8 py-4 text-base font-medium"
+                className="w-full py-3 text-base font-medium bg-primary hover:bg-primary/90 transition-colors shadow-sm"
                 disabled={isPending}
               >
                 {isPending ? (

@@ -39,8 +39,7 @@ const OrderDetailsPage = async (props: {
     })),
   };
 
-  // Provide the Stripe client secret (if available) or null
-  const stripeClientSecret = null; // Adjust this based on your logic
+
 
   return (
     <OrderDetailsTable
