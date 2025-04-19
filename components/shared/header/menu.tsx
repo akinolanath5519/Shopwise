@@ -47,7 +47,7 @@ const Menu = () => {
               className="rounded-full hover:bg-gray-100"
               aria-label="Open menu"
             >
-              <MenuIcon className="h-5 w-5" />
+              <MenuIcon className="h-10 w-10" />
             </Button>
           </SheetTrigger>
           
