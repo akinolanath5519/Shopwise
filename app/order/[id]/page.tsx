@@ -1,51 +1,58 @@
-// app/order/[id]/page.tsx
-
 import { Metadata } from 'next';
 import { getOrderById } from '@/lib/actions/order.action';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import OrderDetailsTable from './order-details-table';
+import { ShippingAddress } from '@/types';
+import { auth } from '@/auth';
+
+// Helper function to convert Decimal to number
+const decimalToNumber = (decimal: any) => parseFloat(decimal.toString());
 
 export const metadata: Metadata = {
   title: 'Order Details',
 };
 
-export const dynamic = 'force-dynamic';
+const OrderDetailsPage = async (props: {
+  params: Promise<{
+    id: string;
+  }>;
+}) => {
+  const { id } = await props.params;
 
-interface OrderDetailsPageProps {
-  params: { id: string };
-}
+  const order = await getOrderById(id);
+  if (!order) notFound();
 
-const OrderDetailsPage = async ({ params }: OrderDetailsPageProps) => {
-  const order = await getOrderById(params.id); // ✅ Access `params.id` directly
+  const session = await auth();
 
-  if (!order) return notFound();
+  
+
+  // Convert all Decimal fields to numbers, including orderitems
+  const orderWithConvertedPrices = {
+    ...order,
+    itemsPrice: decimalToNumber(order.itemsPrice),
+    shippingPrice: decimalToNumber(order.shippingPrice),
+    taxPrice: decimalToNumber(order.taxPrice),
+    totalPrice: decimalToNumber(order.totalPrice),
+    orderitems: order.orderitems.map((item) => ({
+      ...item,
+      price: decimalToNumber(item.price),
+    })),
+  };
+
+  // Provide the Stripe client secret (if available) or null
+  const stripeClientSecret = null; // Adjust this based on your logic
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Order Details</h1>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-          <tbody className="divide-y divide-gray-200">
-            <Row label="Customer Name" value={order.user?.name || 'N/A'} />
-            <Row label="Email" value={order.user?.email || 'N/A'} />
-            <Row label="Total Price" value={`$${Number(order.totalPrice).toFixed(2)}`} />
-            <Row label="Tax" value={`$${Number(order.taxPrice).toFixed(2)}`} />
-            <Row label="Shipping Price" value={`$${Number(order.shippingPrice).toFixed(2)}`} />
-            <Row label="Payment Status" value={order.isPaid ? 'Paid ✅' : 'Not Paid ❌'} />
-            <Row label="Delivery Status" value={order.isDelivered ? 'Delivered 🚚' : 'Pending ⏳'} />
-            <Row label="Created At" value={new Date(order.createdAt).toLocaleString()} />
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <OrderDetailsTable
+      order={{
+        ...orderWithConvertedPrices,
+        shippingAddress: order.shippingAddress as ShippingAddress,
+        paymentMethod: order.PaymentMethod, // Ensure paymentMethod is included
+      }}
+      paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
+     
+    />
   );
 };
-
-const Row = ({ label, value }: { label: string; value: string }) => (
-  <tr className="hover:bg-gray-50 transition-colors">
-    <td className="px-6 py-4 font-medium text-gray-600">{label}</td>
-    <td className="px-6 py-4 text-gray-900">{value}</td>
-  </tr>
-);
 
 export default OrderDetailsPage;
